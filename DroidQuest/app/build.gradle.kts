@@ -4,7 +4,7 @@ plugins {
 
 android {
     namespace = "ru.netology.droidquest"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "ru.netology.droidquest"

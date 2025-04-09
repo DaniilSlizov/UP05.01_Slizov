@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">DroidQuest</string>
+    <string name="question_text1">Это первый вопрос?</string>
+    <string name="question_text2">Это второй вопрос?</string>
 </resources>

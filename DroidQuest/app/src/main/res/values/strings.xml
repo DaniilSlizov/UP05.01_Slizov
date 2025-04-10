@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">DroidQuest</string>
+    <string name="correct_toast">Правильно!</string>
+    <string name="incorrect_toast">Неправильно!</string>
+</resources>

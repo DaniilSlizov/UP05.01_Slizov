@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">DroidQuest</string>
+    <string name="warningTextView">Вы уверены, что хотите это сделать?</string>
+    <string name="show_answer_button">Показать ответ</string>
+    <string name="deceit_button">Обмануть</string>
+    <string name="judgment_toast">Обмануть нельзя.</string>
+</resources>

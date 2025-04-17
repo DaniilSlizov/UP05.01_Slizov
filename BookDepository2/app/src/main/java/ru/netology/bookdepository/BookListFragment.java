@@ -1,5 +1,6 @@
 package ru.netology.bookdepository;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,15 +24,17 @@ public class BookListFragment extends Fragment {
 
         public BookHolder(View itemView) {
             super(itemView);
-            mTitleTextView = itemView.findViewById(R.id.list_item_book_title_text_view); // Используем правильный ID
-            mDateTextView = itemView.findViewById(R.id.list_item_book_date_text_view); // Используем правильный ID
-            mReadedCheckBox = itemView.findViewById(R.id.list_item_book_readed_check_box); // Используем правильный ID
+            mTitleTextView = itemView.findViewById(R.id.list_item_book_title_text_view);
+            mDateTextView = itemView.findViewById(R.id.list_item_book_date_text_view);
+            mReadedCheckBox = itemView.findViewById(R.id.list_item_book_readed_check_box);
             itemView.setOnClickListener(this);
         }
 
         @Override
         public void onClick(View v) {
-            Toast.makeText(getActivity(), mBook.getTitle() + " clicked!", Toast.LENGTH_SHORT).show();
+            Intent intent = MainActivity.newIntent(getActivity(),
+                    mBook.getId());
+            startActivity(intent);
         }
 
         public void bindBook(Book book) {
@@ -79,11 +82,20 @@ public class BookListFragment extends Fragment {
         updateUI();
         return view;
     }
+    @Override
+    public void onResume(){
+        super.onResume();
+        updateUI();
+    }
 
     private void updateUI() {
         BookLab bookLab = BookLab.getBookLab(getActivity());
         List<Book> books = bookLab.getBooks();
-        mAdapter = new BookAdapter(books);
-        mBookRecyclerView.setAdapter(mAdapter);
+        if (mAdapter == null){
+            mAdapter = new BookAdapter(books);
+            mBookRecyclerView.setAdapter(mAdapter);
+        }else{
+            mAdapter.notifyDataSetChanged();
+        }
     }
 }

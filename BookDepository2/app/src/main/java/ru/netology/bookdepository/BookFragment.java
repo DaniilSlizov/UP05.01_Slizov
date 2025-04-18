@@ -1,81 +1,83 @@
 package ru.netology.bookdepository;
 
 import android.os.Bundle;
-import androidx.fragment.app.Fragment;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.EditText;
 import android.widget.CompoundButton;
+import android.widget.EditText;
+
+import androidx.fragment.app.Fragment;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Locale;
+import java.util.UUID;
 
 public class BookFragment extends Fragment {
+    private static final String ARG_BOOK_ID = "book_id";
     private Book mBook;
-    private EditText mTitleEditText;
+    private EditText mTitleField;
     private Button mDateButton;
     private CheckBox mReadedCheckBox;
 
+    public static BookFragment newInstance(UUID bookId){
+        Bundle args = new Bundle();
+        args.putSerializable(ARG_BOOK_ID, bookId);
+        BookFragment fragment = new BookFragment();
+        fragment.setArguments(args);
+        return fragment;
+    }
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (savedInstanceState != null) {
-            mBook = (Book) savedInstanceState.getSerializable("book");
-        } else {
-            mBook = new Book();
-        }
+        UUID bookId = (UUID) getArguments().getSerializable(ARG_BOOK_ID);
+        mBook = BookLab.getBookLab(getActivity()).getBook(bookId);
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_book, container, false);
 
-        mTitleEditText = v.findViewById(R.id.titleEditText);
+        mTitleField = v.findViewById(R.id.book_title);
+        mTitleField.setText(mBook.getTitle());
         mDateButton = v.findViewById(R.id.book_date);
         mReadedCheckBox = v.findViewById(R.id.book_readed);
+        mReadedCheckBox.setChecked(mBook.isReaded());
 
-        if (mBook != null) {
-            mTitleEditText.setText(mBook.getTitle() != null ? mBook.getTitle() : "");
-            mReadedCheckBox.setChecked(mBook.isReaded());
-
-            // Форматирование даты
-            if (mBook.getDate() != null) {
-                SimpleDateFormat formatter = new SimpleDateFormat("dd MMMM yyyy", Locale.getDefault());
-                mDateButton.setText(formatter.format(mBook.getDate()));
-            } else {
-                mDateButton.setText(""); // Или текст по умолчанию
-            }
-        }
-        mTitleEditText.addTextChangedListener(new TextWatcher() {
+        mTitleField.addTextChangedListener(new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                // noop
+            public void beforeTextChanged(CharSequence charSequence, int start, int count, int after) {
             }
 
             @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if (mBook != null) {
-                    mBook.setTitle(s.toString());
-                }
+            public void onTextChanged(CharSequence charSequence, int start, int before, int count) {
+                mBook.setTitle(charSequence.toString());
             }
 
             @Override
-            public void afterTextChanged(Editable s) {
-                // noop
+            public void afterTextChanged(Editable editable) {
             }
         });
 
-        mReadedCheckBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            if (mBook != null) {
+
+        Date date = mBook.getDate();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("EEEE, d, MMMM, yyyy");
+        String formattedDate = dateFormat.format(date);
+        mDateButton.setText(formattedDate);
+        mDateButton.setEnabled(false);
+
+
+        mReadedCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 mBook.setReaded(isChecked);
             }
         });
+
         return v;
     }
 }

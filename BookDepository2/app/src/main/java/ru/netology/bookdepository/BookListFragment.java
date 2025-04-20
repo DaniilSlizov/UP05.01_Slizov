@@ -32,7 +32,7 @@ public class BookListFragment extends Fragment {
 
         @Override
         public void onClick(View v) {
-            Intent intent = MainActivity.newIntent(getActivity(),
+            Intent intent = BookPagerActivity.newIntent(getActivity(),
                     mBook.getId());
             startActivity(intent);
         }

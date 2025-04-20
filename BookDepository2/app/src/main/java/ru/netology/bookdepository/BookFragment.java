@@ -1,5 +1,7 @@
 package ru.netology.bookdepository;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -11,7 +13,9 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 
+import androidx.activity.result.ActivityResult;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -19,6 +23,8 @@ import java.util.UUID;
 
 public class BookFragment extends Fragment {
     private static final String ARG_BOOK_ID = "book_id";
+    private static final String DIALOG_DATE = "DialogDate";
+    private static final int REQUEST_DATE = 0;
     private Book mBook;
     private EditText mTitleField;
     private Button mDateButton;
@@ -68,7 +74,16 @@ public class BookFragment extends Fragment {
         SimpleDateFormat dateFormat = new SimpleDateFormat("EEEE, d, MMMM, yyyy");
         String formattedDate = dateFormat.format(date);
         mDateButton.setText(formattedDate);
-        mDateButton.setEnabled(false);
+        mDateButton.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+                FragmentManager manager = getFragmentManager();
+                DatePickerFragment dialog = DatePickerFragment
+                        .newInstance(mBook.getDate());
+                dialog.setTargetFragment(BookFragment.this, REQUEST_DATE);
+                dialog.show(manager, DIALOG_DATE);
+            }
+        });
 
 
         mReadedCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -80,4 +95,15 @@ public class BookFragment extends Fragment {
 
         return v;
     }
-}
+    @Override public void onActivityResult(int requestCode, int resultCode, Intent data){
+        if (resultCode != Activity.RESULT_OK) {
+            return;
+        }
+        if (requestCode == REQUEST_DATE) {
+            Date date = (Date) data
+                    .getSerializableExtra(DatePickerFragment.EXTRA_DATE);
+            mBook.setDate(date);
+            mDateButton.setText(mBook.getDate().toString());
+        }
+        }
+    }

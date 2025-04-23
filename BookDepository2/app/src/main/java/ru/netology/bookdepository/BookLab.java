@@ -9,30 +9,47 @@ import java.util.UUID;
 public class BookLab {
     private static BookLab sBookLab;
     private List<Book> mBooks;
-    public static BookLab getBookLab(Context context){
-        if (sBookLab == null){
+
+    // Конструктор
+    private BookLab(Context context) {
+        mBooks = new ArrayList<>();
+    }
+
+    // Метод для получения экземпляра BookLab (синглтон)
+    public static BookLab getBookLab(Context context) {
+        if (sBookLab == null) {
             sBookLab = new BookLab(context);
         }
         return sBookLab;
     }
-    private  BookLab(Context context){
-        mBooks = new ArrayList<>();
-        for (int i = 0; i < 100; i++){
-            Book book = new Book();
-            book.setTitle("Book #" + i);
-            book.setReaded(i % 2 == 0);
-            mBooks.add(book);
-        }
+
+    // Метод для добавления книги
+    public void addBook(Book b) {
+        mBooks.add(b);
     }
-    public List<Book> getBooks(){
+
+    // Метод для получения списка всех книг
+    public List<Book> getBooks() {
         return mBooks;
     }
-    public Book getBook(UUID id){
-        for (Book book : mBooks){
-            if (book.getId().equals(id)){
+
+    // Метод для получения книги по ее ID
+    public Book getBook(UUID id) {
+        for (Book book : mBooks) {
+            if (book.getId().equals(id)) {
                 return book;
             }
         }
-        return null;
+        return null; // Если книга не найдена
+    }
+
+    // Метод для удаления книги
+    public void removeBook(UUID id) {
+        for (Book book : mBooks) {
+            if (book.getId().equals(id)) {
+                mBooks.remove(book);
+                break; // Выход из цикла после удаления
+            }
+        }
     }
 }

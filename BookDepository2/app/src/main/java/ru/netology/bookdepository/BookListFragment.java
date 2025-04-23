@@ -3,12 +3,17 @@ package ru.netology.bookdepository;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.TextView;
 import android.widget.Toast;
+import ru.netology.bookdepository.R;
 
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -16,6 +21,10 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.List;
 
 public class BookListFragment extends Fragment {
+    private static final String SAVED_SUBTITLE_VISIBLE = "subtitle";
+    private RecyclerView mBookRecyclerView;
+    private BookAdapter mAdapter;
+    private boolean mSubtitleVisible;
     private class BookHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         private Book mBook;
         private TextView mTitleTextView;
@@ -71,14 +80,22 @@ public class BookListFragment extends Fragment {
         }
     }
 
-    private RecyclerView mBookRecyclerView;
-    private BookAdapter mAdapter;
+
+
+    @Override
+    public void onCreate(Bundle savedInstanceState){
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_book_list, container, false);
         mBookRecyclerView = view.findViewById(R.id.book_recycler_view);
         mBookRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        if (savedInstanceState != null){
+            mSubtitleVisible = savedInstanceState.getBoolean(SAVED_SUBTITLE_VISIBLE);
+        }
         updateUI();
         return view;
     }
@@ -86,6 +103,59 @@ public class BookListFragment extends Fragment {
     public void onResume(){
         super.onResume();
         updateUI();
+    }
+    @Override
+    public void onSaveInstanceState(Bundle outState){
+        super.onSaveInstanceState(outState);
+        outState.putBoolean(SAVED_SUBTITLE_VISIBLE, mSubtitleVisible);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater){
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.fragment_book_list, menu);
+        MenuItem subtitleItem = menu.findItem(R.id.menu_item_show_subtitle);
+        if (mSubtitleVisible){
+//            subtitleItem.setTitle(R.string.hide_subtitle);
+//        }else {
+            subtitleItem.setTitle(R.string.show_subtitle);
+        }
+    }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        if (id == R.id.menu_item_new_book) {
+            Book book = new Book();
+            BookLab.getBookLab(getActivity()).addBook(book);
+            Intent intent = BookPagerActivity.newIntent(getActivity(), book.getId());
+            startActivity(intent);
+            return true;
+        } else if (id == R.id.menu_item_show_subtitle) {
+            mSubtitleVisible = !mSubtitleVisible;
+            getActivity().invalidateOptionsMenu();
+            updateSubtitle();
+            return true;
+        } else {
+            return super.onOptionsItemSelected(item);
+        }
+    }
+
+
+
+    private void updateSubtitle() {
+        BookLab bookLab = BookLab.getBookLab(getActivity());
+        int bookCount = bookLab.getBooks().size();
+        String subtitle = getResources().getQuantityString(R.plurals.subtitle_plural, bookCount, bookCount);
+
+        if (!mSubtitleVisible) {
+            subtitle = null; // Убираем подзаголовок, если он не виден
+        }
+
+        AppCompatActivity activity = (AppCompatActivity) getActivity();
+        if (activity.getSupportActionBar() != null) {
+            activity.getSupportActionBar().setSubtitle(subtitle); // Устанавливаем новый подзаголовок
+        }
     }
 
     private void updateUI() {
@@ -97,5 +167,7 @@ public class BookListFragment extends Fragment {
         }else{
             mAdapter.notifyDataSetChanged();
         }
+        updateSubtitle();
     }
+
 }

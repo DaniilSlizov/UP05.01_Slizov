@@ -11,7 +11,6 @@ import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.TextView;
 import android.widget.Toast;
-import ru.netology.bookdepository.R;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
@@ -25,6 +24,7 @@ public class BookListFragment extends Fragment {
     private RecyclerView mBookRecyclerView;
     private BookAdapter mAdapter;
     private boolean mSubtitleVisible;
+
     private class BookHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         private Book mBook;
         private TextView mTitleTextView;
@@ -41,8 +41,7 @@ public class BookListFragment extends Fragment {
 
         @Override
         public void onClick(View v) {
-            Intent intent = BookPagerActivity.newIntent(getActivity(),
-                    mBook.getId());
+            Intent intent = BookPagerActivity.newIntent(getActivity(), mBook.getId());
             startActivity(intent);
         }
 
@@ -78,12 +77,14 @@ public class BookListFragment extends Fragment {
         public int getItemCount() {
             return mBooks.size();
         }
+
+        public void setBooks(List<Book> books) {
+            mBooks = books;
+        }
     }
 
-
-
     @Override
-    public void onCreate(Bundle savedInstanceState){
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
     }
@@ -93,34 +94,37 @@ public class BookListFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_book_list, container, false);
         mBookRecyclerView = view.findViewById(R.id.book_recycler_view);
         mBookRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        if (savedInstanceState != null){
+        if (savedInstanceState != null) {
             mSubtitleVisible = savedInstanceState.getBoolean(SAVED_SUBTITLE_VISIBLE);
         }
         updateUI();
         return view;
     }
+
     @Override
-    public void onResume(){
+    public void onResume() {
         super.onResume();
         updateUI();
     }
+
     @Override
-    public void onSaveInstanceState(Bundle outState){
+    public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putBoolean(SAVED_SUBTITLE_VISIBLE, mSubtitleVisible);
     }
 
     @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater){
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.fragment_book_list, menu);
         MenuItem subtitleItem = menu.findItem(R.id.menu_item_show_subtitle);
-        if (mSubtitleVisible){
-//            subtitleItem.setTitle(R.string.hide_subtitle);
-//        }else {
+        if (mSubtitleVisible) {
+            subtitleItem.setTitle(R.string.hide_subtitle);
+        } else {
             subtitleItem.setTitle(R.string.show_subtitle);
         }
     }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
@@ -141,8 +145,6 @@ public class BookListFragment extends Fragment {
         }
     }
 
-
-
     private void updateSubtitle() {
         BookLab bookLab = BookLab.getBookLab(getActivity());
         int bookCount = bookLab.getBooks().size();
@@ -161,13 +163,18 @@ public class BookListFragment extends Fragment {
     private void updateUI() {
         BookLab bookLab = BookLab.getBookLab(getActivity());
         List<Book> books = bookLab.getBooks();
-        if (mAdapter == null){
+        if (mAdapter == null) {
             mAdapter = new BookAdapter(books);
             mBookRecyclerView.setAdapter(mAdapter);
-        }else{
+        } else {
+            mAdapter.setBooks(books);
             mAdapter.notifyDataSetChanged();
         }
         updateSubtitle();
-    }
 
+        // Check if the book list is empty and show a Toast message
+        if (books.isEmpty()) {
+            Toast.makeText(getActivity(), "Список пуст", Toast.LENGTH_SHORT).show();
+        }
+    }
 }

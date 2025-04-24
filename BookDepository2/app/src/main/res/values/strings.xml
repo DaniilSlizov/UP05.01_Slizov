@@ -12,8 +12,8 @@
     <string name="date_book">Дата прочтения книги</string>
     <string name="delete_book">Удалить книгу</string>
     <plurals name="subtitle_plural">
-        <item quantity="one">%d book</item>
-        <item quantity="other">%d books</item>
+        <item quantity="one">%1$d book</item>
+        <item quantity="other">%1$d books</item>
     </plurals>
 
 

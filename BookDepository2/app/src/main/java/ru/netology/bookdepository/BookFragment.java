@@ -17,6 +17,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.UUID;
@@ -29,7 +30,8 @@ public class BookFragment extends Fragment {
     private EditText mTitleField;
     private Button mDateButton;
     private CheckBox mReadedCheckBox;
-    private Button mRemoveBookButton; // Кнопка удаления
+    private Button mRemoveBookButton;
+    private Button mReportButton;
 
     public static BookFragment newInstance(UUID bookId) {
         Bundle args = new Bundle();
@@ -45,8 +47,9 @@ public class BookFragment extends Fragment {
         UUID bookId = (UUID) getArguments().getSerializable(ARG_BOOK_ID);
         mBook = BookLab.getBookLab(getActivity()).getBook(bookId);
     }
+
     @Override
-    public void onPause(){
+    public void onPause() {
         super.onPause();
         BookLab.getBookLab(getActivity()).updateBook(mBook);
     }
@@ -60,12 +63,11 @@ public class BookFragment extends Fragment {
         mDateButton = v.findViewById(R.id.book_date);
         mReadedCheckBox = v.findViewById(R.id.book_readed);
         mReadedCheckBox.setChecked(mBook.isReaded());
-        mRemoveBookButton = v.findViewById(R.id.remove_book_button); // Инициализация кнопки удаления
+        mRemoveBookButton = v.findViewById(R.id.remove_book_button);
 
         mTitleField.addTextChangedListener(new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence charSequence, int start, int count, int after) {
-            }
+            public void beforeTextChanged(CharSequence charSequence, int start, int count, int after) {}
 
             @Override
             public void onTextChanged(CharSequence charSequence, int start, int before, int count) {
@@ -73,8 +75,7 @@ public class BookFragment extends Fragment {
             }
 
             @Override
-            public void afterTextChanged(Editable editable) {
-            }
+            public void afterTextChanged(Editable editable) {}
         });
 
         Date date = mBook.getDate();
@@ -85,8 +86,7 @@ public class BookFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 FragmentManager manager = getFragmentManager();
-                DatePickerFragment dialog = DatePickerFragment
-                        .newInstance(mBook.getDate());
+                DatePickerFragment dialog = DatePickerFragment.newInstance(mBook.getDate());
                 dialog.setTargetFragment(BookFragment.this, REQUEST_DATE);
                 dialog.show(manager, DIALOG_DATE);
             }
@@ -103,6 +103,19 @@ public class BookFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 showConfirmationDialog();
+            }
+        });
+
+        mReportButton = v.findViewById(R.id.book_report);
+        mReportButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent i = new Intent(Intent.ACTION_SEND);
+                i.setType("text/plain");
+                i.putExtra(Intent.EXTRA_TEXT, getBookReport());
+                i.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.book_report_subject));
+                i = Intent.createChooser(i, getString(R.string.send_report));
+                startActivity(i);
             }
         });
 
@@ -132,5 +145,19 @@ public class BookFragment extends Fragment {
             SimpleDateFormat dateFormat = new SimpleDateFormat("EEEE, d, MMMM, yyyy");
             mDateButton.setText(dateFormat.format(mBook.getDate()));
         }
+    }
+
+    private String getBookReport() {
+        String readedString;
+        if (mBook.isReaded()) {
+            readedString = getString(R.string.book_report_readed);
+        } else {
+            readedString = getString(R.string.book_report_unreaded);
+        }
+        String dateFormat = "EEE, MM dd";
+        String dateString = DateFormat
+                .getDateInstance(DateFormat.MEDIUM).format(mBook.getDate());
+        String report = getString(R.string.book_report, mBook.getTitle(), dateString, readedString);
+        return report;
     }
 }

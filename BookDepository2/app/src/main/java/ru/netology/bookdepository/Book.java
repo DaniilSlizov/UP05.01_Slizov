@@ -9,7 +9,10 @@ public class Book{
     private Date mDate;
     private boolean mReaded;
     public Book(){
-        mId = UUID.randomUUID();
+        this(UUID.randomUUID());
+    }
+    public Book(UUID id){
+        mId = id;
         mDate = new Date();
     }
     public UUID getId() {
@@ -32,5 +35,8 @@ public class Book{
     }
     public void setReaded(boolean readed) {
         mReaded = readed;
+    }
+    public String getPhotoFilename(){
+        return "IMG_" + getId().toString() + ".jpg";
     }
 }

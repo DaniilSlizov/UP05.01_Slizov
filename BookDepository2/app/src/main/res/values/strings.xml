@@ -5,6 +5,22 @@
     <string name="book_details_label">Описание</string>
     <string name="book_readed_label">Прочтена?</string>
     <string name="date_picker_title">Дата начала прочтения:</string>
+    <string name="new_book">Новая книга</string>
+    <string name="show_subtitle">Показать подзаголовок</string>
+    <string name="hide_subtitle">Скрыть подзаголовок</string>
     <string name="title_book">Заголовок книги</string>
     <string name="date_book">Дата прочтения книги</string>
+    <string name="delete_book">Удалить книгу</string>
+    <string name="book_report_text">Отправить отчёт о прочтении</string>
+    <string name="book_report">%1$s Книга была запланирована к прочтению %2$s и %3$s</string>
+    <string name="book_report_readed">Книга прочтена</string>
+    <string name="book_report_unreaded">Книга не прочтена</string>
+    <string name="book_report_subject">BookDepository отчёт о прочтении</string>
+    <string name="send_report">Отправить отчёт о прочтении</string>
+    <plurals name="subtitle_plural">
+        <item quantity="one">%1$d book</item>
+        <item quantity="other">%1$d books</item>
+    </plurals>
+
+
 </resources>
